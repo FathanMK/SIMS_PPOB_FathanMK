@@ -1,4 +1,6 @@
-import {useState, useCallback} from 'react';
+import {useCallback} from 'react';
+
+import useInput from './useInput';
 import validateInput from '../utils/validateInput';
 
 const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -6,13 +8,6 @@ const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const CHECK_VALUE_ERROR_TEXT = 'cek input kembali';
 const DIFFERENT_PASSWORD_CONFIRM_PASSWORD_ERROR_TEXT = 'cek password kembali';
 const PASSWORD_MIN_8_ERROR_TEXT = 'minimal 8 karakter';
-
-const useInput = (initialValue: string) => {
-  const [value, setValue] = useState(initialValue);
-  const [validation, setValidation] = useState('');
-
-  return {value, setValue, validation, setValidation};
-};
 
 export default function useValidations() {
   const email = useInput('');
@@ -63,7 +58,6 @@ export default function useValidations() {
     () => validateInput(lastName.value, lastName.setValidation, false),
     [lastName.value, lastName.setValidation],
   );
-
   return {
     email,
     validateEmail,
