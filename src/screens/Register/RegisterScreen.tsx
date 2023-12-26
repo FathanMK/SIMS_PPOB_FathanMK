@@ -2,35 +2,35 @@ import {
   Box,
   Button,
   ButtonText,
-  FormControl,
-  FormControlError,
-  FormControlErrorText,
   Image,
   Input,
   InputField,
   InputIcon,
   InputSlot,
   ScrollView,
+  Spinner,
   Text,
   View,
 } from '@gluestack-ui/themed';
 import {AtSignIcon, EyeIcon, LockIcon, UserIcon} from 'lucide-react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {Controller} from 'react-hook-form';
 
 import useRegister from './hooks/useRegister';
 
 export default function RegisterScreen() {
   const {
-    email,
-    firstName,
-    lastName,
-    password,
-    confirmPassword,
     showPassword,
     handleShowPassword,
-    handleSubmit,
     handleNavigateLogin,
+    control,
+    watch,
+    errors,
+    handleSubmit,
+    onSubmit,
+    isLoading,
   } = useRegister();
+
   return (
     <View flex={1} as={SafeAreaView}>
       <ScrollView
@@ -64,136 +64,250 @@ export default function RegisterScreen() {
           </Text>
         </Box>
         <Box gap="$4" w="$5/6">
-          <FormControl isInvalid={email.validation.length > 0}>
-            <Input size="xl">
-              <InputSlot pl="$4">
-                <InputIcon as={AtSignIcon} size="sm" color="rgba(0,0,0,0.3)" />
-              </InputSlot>
-              <InputField
-                size="sm"
-                inputMode="email"
-                fontWeight="600"
-                placeholderTextColor="rgba(0,0,0,0.3)"
-                placeholder="masukan email anda"
-                onChangeText={email.setValue}
-              />
-            </Input>
-            <FormControlError justifyContent="flex-end">
-              {email.validation && (
-                <FormControlErrorText>{email.validation}</FormControlErrorText>
-              )}
-            </FormControlError>
-          </FormControl>
-          <FormControl isInvalid={firstName.validation.length > 0}>
-            <Input size="xl">
-              <InputSlot pl="$4">
-                <InputIcon as={UserIcon} size="sm" color="rgba(0,0,0,0.3)" />
-              </InputSlot>
-              <InputField
-                size="sm"
-                inputMode="text"
-                fontWeight="600"
-                placeholderTextColor="rgba(0,0,0,0.3)"
-                placeholder="nama depan"
-                onChangeText={firstName.setValue}
-              />
-            </Input>
-            <FormControlError justifyContent="flex-end">
-              {firstName.validation && (
-                <FormControlErrorText>
-                  {firstName.validation}
-                </FormControlErrorText>
-              )}
-            </FormControlError>
-          </FormControl>
-          <FormControl isInvalid={lastName.validation.length > 0}>
-            <Input size="xl">
-              <InputSlot pl="$4">
-                <InputIcon as={UserIcon} size="sm" color="rgba(0,0,0,0.3)" />
-              </InputSlot>
-              <InputField
-                size="sm"
-                inputMode="text"
-                fontWeight="600"
-                placeholderTextColor="rgba(0,0,0,0.3)"
-                placeholder="nama belakang"
-                onChangeText={lastName.setValue}
-              />
-            </Input>
-            <FormControlError justifyContent="flex-end">
-              {lastName.validation && (
-                <FormControlErrorText>
-                  {lastName.validation}
-                </FormControlErrorText>
-              )}
-            </FormControlError>
-          </FormControl>
-          <FormControl isInvalid={password.validation.length > 0}>
-            <Input size="xl">
-              <InputSlot pl="$4">
-                <InputIcon as={LockIcon} size="sm" color="rgba(0,0,0,0.3)" />
-              </InputSlot>
-              <InputField
-                type={showPassword ? 'text' : 'password'}
-                size="sm"
-                placeholder="buat password"
-                fontWeight="600"
-                placeholderTextColor="rgba(0,0,0,0.3)"
-                onChangeText={password.setValue}
-              />
-              <InputSlot pr="$4" onPress={handleShowPassword}>
-                <InputIcon
-                  as={EyeIcon}
-                  size="sm"
-                  color={showPassword ? '$green' : '$primaryRed500'}
-                />
-              </InputSlot>
-            </Input>
-            <FormControlError justifyContent="flex-end">
-              {password.validation && (
-                <FormControlErrorText>
-                  {password.validation}
-                </FormControlErrorText>
-              )}
-            </FormControlError>
-          </FormControl>
-          <FormControl isInvalid={confirmPassword.validation.length > 0}>
-            <Input size="xl">
-              <InputSlot pl="$4">
-                <InputIcon as={LockIcon} size="sm" color="rgba(0,0,0,0.3)" />
-              </InputSlot>
-              <InputField
-                type={showPassword ? 'text' : 'password'}
-                size="sm"
-                placeholder="konfirmasi password"
-                fontWeight="600"
-                placeholderTextColor="rgba(0,0,0,0.3)"
-                onChangeText={confirmPassword.setValue}
-              />
-              <InputSlot pr="$4" onPress={handleShowPassword}>
-                <InputIcon
-                  as={EyeIcon}
-                  size="sm"
-                  color={showPassword ? '$green' : '$primaryRed500'}
-                />
-              </InputSlot>
-            </Input>
-            <FormControlError justifyContent="flex-end">
-              {confirmPassword.validation && (
-                <FormControlErrorText>
-                  {confirmPassword.validation}
-                </FormControlErrorText>
-              )}
-            </FormControlError>
-          </FormControl>
+          <Controller
+            control={control}
+            rules={{
+              required: 'tidak boleh kosong',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'cek email kembali',
+              },
+            }}
+            name="email"
+            render={({field: {onChange, onBlur, value}}) => (
+              <Box>
+                <Input
+                  borderColor={
+                    errors.email ? '$primaryRed500' : 'rgba(0,0,0,0.3)'
+                  }
+                  size="xl">
+                  <InputSlot pl="$4">
+                    <InputIcon
+                      as={AtSignIcon}
+                      size="sm"
+                      color="rgba(0,0,0,0.35)"
+                    />
+                  </InputSlot>
+                  <InputField
+                    size="sm"
+                    inputMode="email"
+                    fontWeight="600"
+                    placeholder="masukan email anda"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                </Input>
+                <Box alignItems="flex-end" mt="$1" justifyContent="flex-end">
+                  {errors.email && (
+                    <Text color="$primaryRed500">{errors.email.message}</Text>
+                  )}
+                </Box>
+              </Box>
+            )}
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: 'tidak boleh kosong',
+            }}
+            name="firstName"
+            render={({field: {onChange, onBlur, value}}) => (
+              <Box>
+                <Input
+                  borderColor={
+                    errors.firstName ? '$primaryRed500' : 'rgba(0,0,0,0.3)'
+                  }
+                  size="xl">
+                  <InputSlot pl="$4">
+                    <InputIcon
+                      as={UserIcon}
+                      size="sm"
+                      color="rgba(0,0,0,0.3)"
+                    />
+                  </InputSlot>
+                  <InputField
+                    size="sm"
+                    inputMode="text"
+                    fontWeight="600"
+                    placeholder="nama depan"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                </Input>
+                <Box alignItems="flex-end" mt="$1" justifyContent="flex-end">
+                  {errors.firstName && (
+                    <Text color="$primaryRed500">
+                      {errors.firstName.message}
+                    </Text>
+                  )}
+                </Box>
+              </Box>
+            )}
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: 'tidak boleh kosong',
+            }}
+            name="lastName"
+            render={({field: {onChange, onBlur, value}}) => (
+              <Box>
+                <Input
+                  borderColor={
+                    errors.lastName ? '$primaryRed500' : 'rgba(0,0,0,0.3)'
+                  }
+                  size="xl">
+                  <InputSlot pl="$4">
+                    <InputIcon
+                      as={UserIcon}
+                      size="sm"
+                      color="rgba(0,0,0,0.3)"
+                    />
+                  </InputSlot>
+                  <InputField
+                    size="sm"
+                    inputMode="text"
+                    fontWeight="600"
+                    placeholder="nama belakang"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                </Input>
+                <Box alignItems="flex-end" mt="$1" justifyContent="flex-end">
+                  {errors.lastName && (
+                    <Text color="$primaryRed500">
+                      {errors.lastName.message}
+                    </Text>
+                  )}
+                </Box>
+              </Box>
+            )}
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: 'tidak boleh kosong',
+              minLength: {
+                value: 8,
+                message: 'minimal 8 karakter',
+              },
+            }}
+            name="password"
+            render={({field: {onChange, onBlur, value}}) => (
+              <Box>
+                <Input
+                  borderColor={
+                    errors.password ? '$primaryRed500' : 'rgba(0,0,0,0.3)'
+                  }
+                  size="xl">
+                  <InputSlot pl="$4">
+                    <InputIcon
+                      as={LockIcon}
+                      size="sm"
+                      color="rgba(0,0,0,0.35)"
+                    />
+                  </InputSlot>
+                  <InputField
+                    type={showPassword ? 'text' : 'password'}
+                    size="sm"
+                    fontWeight="600"
+                    placeholder="buat password"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                  <InputSlot pr="$4" onPress={handleShowPassword}>
+                    <InputIcon
+                      as={EyeIcon}
+                      size="sm"
+                      color={showPassword ? '$green' : '$primaryRed500'}
+                    />
+                  </InputSlot>
+                </Input>
+                <Box alignItems="flex-end" mt="$1" justifyContent="flex-end">
+                  {errors.password && (
+                    <Text color="$primaryRed500">
+                      {errors.password.message}
+                    </Text>
+                  )}
+                </Box>
+              </Box>
+            )}
+          />
+          <Controller
+            control={control}
+            rules={{
+              required: 'tidak boleh kosong',
+              minLength: {
+                value: 8,
+                message: 'minimal 8 karakter',
+              },
+              validate: (val: string) => {
+                if (watch('password') != val) {
+                  return 'password tidak sama';
+                }
+              },
+            }}
+            name="confirmPassword"
+            render={({field: {onChange, onBlur, value}}) => (
+              <Box>
+                <Input
+                  borderColor={
+                    errors.confirmPassword
+                      ? '$primaryRed500'
+                      : 'rgba(0,0,0,0.3)'
+                  }
+                  size="xl">
+                  <InputSlot pl="$4">
+                    <InputIcon
+                      as={LockIcon}
+                      size="sm"
+                      color="rgba(0,0,0,0.35)"
+                    />
+                  </InputSlot>
+                  <InputField
+                    type={showPassword ? 'text' : 'password'}
+                    size="sm"
+                    fontWeight="600"
+                    placeholder="konfirmasi password"
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                  />
+                  <InputSlot pr="$4" onPress={handleShowPassword}>
+                    <InputIcon
+                      as={EyeIcon}
+                      size="sm"
+                      color={showPassword ? '$green' : '$primaryRed500'}
+                    />
+                  </InputSlot>
+                </Input>
+                <Box alignItems="flex-end" mt="$1" justifyContent="flex-end">
+                  {errors.confirmPassword && (
+                    <Text color="$primaryRed500">
+                      {errors.confirmPassword.message}
+                    </Text>
+                  )}
+                </Box>
+              </Box>
+            )}
+          />
         </Box>
         <Box w="$5/6" my="$10">
           <Button
+            isDisabled={isLoading}
             size="lg"
             bgColor="$primaryRed500"
             $active={{bgColor: '$primaryRed600'}}
-            onPress={handleSubmit}>
-            <ButtonText size="sm">Masuk</ButtonText>
+            onPress={handleSubmit(onSubmit)}>
+            {isLoading ? (
+              <Spinner size="large" color="$white" />
+            ) : (
+              <ButtonText size="sm">Register</ButtonText>
+            )}
           </Button>
         </Box>
         <Box>

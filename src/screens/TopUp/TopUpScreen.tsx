@@ -24,7 +24,7 @@ import useTopUp from './hooks/useTopUp';
 import formatToIDR from '../../utils/formatToIDR';
 
 export default function TopUpScreen() {
-  const {topUpWidth, handleBack, topUp, handleTopUp} = useTopUp();
+  const {topUpWidth, handleBack} = useTopUp();
   return (
     <View flex={1} as={SafeAreaView}>
       <Box p="$6" flexDirection="row" justifyContent="space-between">
@@ -78,7 +78,7 @@ export default function TopUpScreen() {
           </Text>
         </Box>
         <Box px="$6">
-          <FormControl>
+          {/* <FormControl>
             <Input size="xl">
               <InputSlot pl="$4">
                 <InputIcon as={WalletIcon} size="sm" color="rgba(0,0,0,0.35)" />
@@ -98,10 +98,10 @@ export default function TopUpScreen() {
                 <FormControlErrorText>{topUp.validation}</FormControlErrorText>
               )}
             </FormControlError>
-          </FormControl>
+          </FormControl> */}
         </Box>
         <Box p="$6" gap="$2" flexDirection="row" flexWrap="wrap">
-          {topUpServices.map(item => (
+          {/* {topUpServices.map(item => (
             <Pressable
               key={item.top_up_id}
               p="$4"
@@ -126,11 +126,10 @@ export default function TopUpScreen() {
                 {formatToIDR(item.top_up_amount)}
               </Text>
             </Pressable>
-          ))}
+          ))} */}
         </Box>
         <Box px="$6" my="$10">
           <Button
-            isDisabled={topUp.value.length <= 0}
             size="lg"
             bgColor="$primaryRed500"
             $active={{bgColor: '$primaryRed600'}}>
