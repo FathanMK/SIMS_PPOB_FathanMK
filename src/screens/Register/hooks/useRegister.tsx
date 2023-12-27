@@ -5,7 +5,7 @@ import {useForm} from 'react-hook-form';
 
 import type {INewUser} from '../../../interfaces/INewUser';
 import {useAppNavigation, useShowPassword} from '../../../hooks';
-import axiosInstance from '../../../utils/axiosInstance';
+import {axiosInstance} from '../../../utils/axiosInstances';
 import showToast from '../../../utils/showToast/showToast';
 
 export default function useRegister() {
@@ -52,7 +52,6 @@ export default function useRegister() {
       }, 1000);
     },
     onError(error: any) {
-      console.log(error.response.data);
       showToast({
         toast,
         renderContent: () => (

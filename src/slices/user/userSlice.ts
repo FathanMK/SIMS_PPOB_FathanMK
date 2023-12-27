@@ -1,8 +1,15 @@
 import {createSlice} from '@reduxjs/toolkit';
 
-const initialState = {
+interface IInitialState {
+  token: string;
+  user: any;
+  balance: number;
+}
+
+const initialState: IInitialState = {
   token: '',
   user: null,
+  balance: 0,
 };
 
 const userSlice = createSlice({
@@ -15,8 +22,11 @@ const userSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
     },
+    setBalance: (state, action) => {
+      state.balance = action.payload;
+    },
   },
 });
 
-export const {setToken, setUser} = userSlice.actions;
+export const {setToken, setUser, setBalance} = userSlice.actions;
 export default userSlice.reducer;

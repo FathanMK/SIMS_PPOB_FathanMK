@@ -6,16 +6,28 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Spinner,
   Text,
   View,
 } from '@gluestack-ui/themed';
 import {ImageBackground} from 'react-native';
-import {EyeIcon} from 'lucide-react-native';
+import {EyeIcon, EyeOffIcon} from 'lucide-react-native';
 
-import localServices from './data/services';
-import localBanners from './data/banners';
+import formatToIDR from '../../utils/formatToIDR';
+import useHome from './hooks/useHome';
 
 export default function HomeScreen() {
+  const {
+    user,
+    balance,
+    showBalance,
+    handleShowBalance,
+    bannersData,
+    bannersLoading,
+    servicesData,
+    servicesLoading,
+    handleNavigatePembayaran,
+  } = useHome();
   return (
     <View flex={1} as={SafeAreaView}>
       <ScrollView>
@@ -45,8 +57,11 @@ export default function HomeScreen() {
               role="img"
               h="$8"
               w="$8"
+              rounded="$full"
               source={{
-                uri: 'https://res.cloudinary.com/dts5hyzdq/image/upload/v1703410487/_SIMS_PPOB_FathanMK/qraer7awg7likrdnu4ke.png',
+                uri: user?.profile_image.includes('null')
+                  ? 'https://res.cloudinary.com/dts5hyzdq/image/upload/v1703410487/_SIMS_PPOB_FathanMK/qraer7awg7likrdnu4ke.png'
+                  : user?.profile_image,
               }}
             />
           </Pressable>
@@ -56,7 +71,7 @@ export default function HomeScreen() {
             Selamat Datang,
           </Text>
           <Text fontSize="$2xl" lineHeight="$2xl" fontWeight="$bold">
-            Kristanto Wibowo
+            {`${user.first_name} ${user.last_name}`}
           </Text>
         </Box>
         <ImageBackground
@@ -70,70 +85,94 @@ export default function HomeScreen() {
             Saldo anda
           </Text>
           <HStack space="sm" alignItems="center">
-            <Text
-              color="$white"
-              fontWeight="$black"
-              fontSize="$3xl"
-              lineHeight="$3xl">
-              Rp
-            </Text>
-            <Text
-              color="$white"
-              fontWeight="$black"
-              fontSize="$4xl"
-              lineHeight="$5xl">
-              •••••••
-            </Text>
+            {showBalance ? (
+              <Text
+                color="$white"
+                fontWeight="$black"
+                fontSize="$4xl"
+                lineHeight="$5xl">
+                {formatToIDR(balance)}
+              </Text>
+            ) : (
+              <Text
+                color="$white"
+                fontWeight="$black"
+                fontSize="$4xl"
+                lineHeight="$5xl">
+                {`Rp ${String(balance).replace(/./g, '•')}`}
+              </Text>
+            )}
           </HStack>
-          <HStack space="sm" alignItems="center">
+          <Pressable
+            flexDirection="row"
+            alignItems="center"
+            gap="$2"
+            onPress={handleShowBalance}>
             <Text color="$white" fontSize="$sm">
               Lihat Saldo
             </Text>
-            <EyeIcon color="white" size={14} />
-          </HStack>
+            {showBalance ? (
+              <EyeIcon color="white" size={14} />
+            ) : (
+              <EyeOffIcon color="white" size={14} />
+            )}
+          </Pressable>
         </ImageBackground>
         <Box px="$6" flexDirection="row" flexWrap="wrap">
-          {localServices.map(item => (
-            <Pressable
-              key={item.service_code}
-              mt="$6"
-              flexBasis="$1/6"
-              alignItems="center">
-              <Image
-                w="$12"
-                h="$12"
-                role="img"
-                alt={`${item.service_name}`}
-                source={{uri: item.service_icon}}
-              />
-              <Text fontSize="$xs" fontWeight="$medium">
-                {item.service_name
-                  .replace('Pajak', '')
-                  .replace('Berlangganan', '')
-                  .replace('Voucher', '')
-                  .replace('Paket', '')}
-              </Text>
-            </Pressable>
-          ))}
+          {servicesLoading ? (
+            <Box w="$full" my="$6" alignItems="center" justifyContent="center">
+              <Spinner size="large" color="$primaryRed500" />
+            </Box>
+          ) : (
+            servicesData.map((item: any) => (
+              <Pressable
+                key={item.service_code}
+                mt="$6"
+                flexBasis="$1/6"
+                alignItems="center"
+                onPress={() => handleNavigatePembayaran(item)}>
+                <Image
+                  w="$12"
+                  h="$12"
+                  role="img"
+                  alt={`${item.service_name}`}
+                  source={{uri: item.service_icon}}
+                />
+                <Text fontSize="$xs" fontWeight="$medium">
+                  {item.service_name
+                    .replace('Pajak', '')
+                    .replace('Berlangganan', '')
+                    .replace('Voucher', '')
+                    .replace('Paket', '')}
+                </Text>
+              </Pressable>
+            ))
+          )}
         </Box>
         <Box p="$6">
           <Text fontWeight="$bold">Temukan promo menarik</Text>
           <Box py="$6">
-            <FlatList
-              horizontal
-              data={localBanners}
-              renderItem={({item}: {item: any}) => (
-                <Pressable width="$80">
-                  <Image
-                    h="$32"
-                    w="$72"
-                    role="img"
-                    alt={`${item.banner_name}-banner`}
-                    source={{uri: item.banner_image}}
-                  />
-                </Pressable>
-              )}
-            />
+            {bannersLoading ? (
+              <Box mt="$10">
+                <Spinner size="large" color="$primaryRed500" />
+              </Box>
+            ) : (
+              <FlatList
+                horizontal
+                data={bannersData}
+                renderItem={({item}: {item: any}) => (
+                  <Pressable width="$80">
+                    <Image
+                      h="$32"
+                      w="$72"
+                      role="img"
+                      alt={`${item.banner_name}-banner`}
+                      source={{uri: item.banner_image}}
+                    />
+                  </Pressable>
+                )}
+              />
+            )}
           </Box>
         </Box>
       </ScrollView>

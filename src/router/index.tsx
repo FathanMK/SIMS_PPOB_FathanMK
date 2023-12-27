@@ -23,6 +23,7 @@ function Home() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: '#000000',
         tabBarStyle: {height: 70, paddingBottom: 10},
       }}>

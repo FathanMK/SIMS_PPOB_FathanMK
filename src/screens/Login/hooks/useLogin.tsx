@@ -5,10 +5,9 @@ import {useState} from 'react';
 
 import {useShowPassword, useAppNavigation} from '../../../hooks';
 import showToast from '../../../utils/showToast/showToast';
-import axiosInstance from '../../../utils/axiosInstance';
+import {axiosInstance, axiosInstanceWAuth} from '../../../utils/axiosInstances';
 import useAppDispatch from '../../../hooks/useAppDispatch';
-import {setToken, setUser} from '../../../slices/user/userSlice';
-import useAppSelector from '../../../hooks/useAppSelector';
+import {setToken, setUser, setBalance} from '../../../slices/user/userSlice';
 
 interface ILoginFormValues {
   email: string;
@@ -44,7 +43,7 @@ export default function useLogin() {
           <Toast action="success" variant="accent">
             <VStack space="xs">
               <ToastDescription color="$green500">
-                register berhasil, silahkan login
+                login berhasil, mohon ditunggu
               </ToastDescription>
             </VStack>
           </Toast>
@@ -52,15 +51,18 @@ export default function useLogin() {
       });
       const token = data.data.data.token;
       dispatch(setToken(token));
-      await axiosInstance
-        .get('/profile', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+      await axiosInstanceWAuth(token)
+        .get('/profile')
         .then(response => {
           const {data} = response.data;
           dispatch(setUser(data));
+        })
+        .catch(error => console.log(error));
+      await axiosInstanceWAuth(token)
+        .get('/balance')
+        .then(response => {
+          const {data} = response.data;
+          dispatch(setBalance(data.balance));
           navigation.navigate('Home');
           setLoading(false);
         })
